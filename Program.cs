@@ -9,22 +9,19 @@ namespace csharp_replicaset_config
     {
         static void Main(string[] args)
         {
-            // var connectionTask1 = Task.Run(() => { return ConnectMongoInstance("mongodb://localhost:27017/?connect=direct"); });
-            var connectionTask1 = Task.Run(() => { return ConnectMongoInstance("mongodb://mongo1:27017/?connect=direct"); });
-            // var connectionTask1 = Task.Run(() => { return ConnectMongoInstance("mongodb://localhost:27017/?replicaSet=Replica_UOC"); });
-            Task.WaitAll(connectionTask1);
-            var mongo1 = connectionTask1.Result;
+            Console.WriteLine("Waiting 20 seconds to let mongo instances be ready");
+            Task.WaitAll(Task.Delay(20000));
+            var mongo1 = ConnectMongoInstance("mongodb://mongo1:27017/?connect=direct");
             if (mongo1 == null)
             {
                 Console.WriteLine("Couldn't connect to the main instance");
                 return;
             }
-            Console.WriteLine("Connected to the mongodb 1 instance");
-            var db = mongo1.GetDatabase("admin");
-            var command = GetReplicasetCommand();
+            Console.WriteLine("Connected to mongodb1 instance");
             try
             {
-                var result = db.RunCommand<BsonDocument>(command);
+                var db = mongo1.GetDatabase("admin");
+                var command = GetReplicasetCommand();var result = db.RunCommand<BsonDocument>(command);
                 Console.WriteLine("Replicaset created");
             }
             catch
@@ -44,7 +41,7 @@ namespace csharp_replicaset_config
                 try
                 {
                     client = new MongoClient(server);
-                    retries = MAX_RETRIES;
+                    return client;
                 }
                 catch
                 {
@@ -52,7 +49,7 @@ namespace csharp_replicaset_config
                     retries++;
                 }
             }
-            return client;
+            return null;
         }
 
         private static BsonDocument GetReplicasetCommand()
