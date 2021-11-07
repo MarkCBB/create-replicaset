@@ -21,7 +21,8 @@ namespace csharp_replicaset_config
             try
             {
                 var db = mongo1.GetDatabase("admin");
-                var command = GetReplicasetCommand();var result = db.RunCommand<BsonDocument>(command);
+                var command = GetReplicasetCommand();
+                var result = db.RunCommand<BsonDocument>(command);
                 Console.WriteLine("Replicaset created");
             }
             catch
